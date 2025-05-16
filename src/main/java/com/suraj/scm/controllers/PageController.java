@@ -6,9 +6,11 @@ import com.suraj.scm.helpers.Message;
 import com.suraj.scm.helpers.MessageType;
 import com.suraj.scm.services.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -52,15 +54,15 @@ public class PageController {
 	}
 
 	@PostMapping("/do-register")
-	public String processRegistration(@ModelAttribute UserForm userForm, HttpSession session) {
+	public String processRegistration(@Valid @ModelAttribute UserForm userForm, BindingResult bindingResult, HttpSession session) {
 		System.out.println("Processing registration");
-//		User user = User.builder()
-//				.name(userForm.getName())
-//				.email(userForm.getEmail())
-//				.password(userForm.getPassword())
-//				.phoneNumber(userForm.getPhoneNumber())
-//				.about(userForm.getAbout())
-//				.build();
+
+		// Validate the user form data
+		if (bindingResult.hasErrors()) {
+			System.out.println("Validation errors occurred");
+			return "register";
+		}
+
 		User user = new User();
 		user.setName(userForm.getName());
 		user.setEmail(userForm.getEmail());
