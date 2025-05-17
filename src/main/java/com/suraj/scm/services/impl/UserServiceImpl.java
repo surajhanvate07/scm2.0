@@ -2,11 +2,13 @@ package com.suraj.scm.services.impl;
 
 import com.suraj.scm.entities.User;
 import com.suraj.scm.exceptions.ResourceNotFoundException;
+import com.suraj.scm.helpers.AppConstants;
 import com.suraj.scm.repositories.UserRepository;
 import com.suraj.scm.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
@@ -26,6 +31,9 @@ public class UserServiceImpl implements UserService {
 		//  Generate a unique ID for the user
 		String userId = UUID.randomUUID().toString();
 		user.setUserId(userId);
+		// Encode the password before saving
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		user.setRoles(List.of(AppConstants.ROLE_USER));
 		return userRepository.save(user);
 	}
 
@@ -39,7 +47,7 @@ public class UserServiceImpl implements UserService {
 		User fetchedUser = userRepository.findById(user.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + user.getUserId()));
 		fetchedUser.setName(user.getName());
 		fetchedUser.setEmail(user.getEmail());
-		fetchedUser.setPassword(user.getPassword());
+		fetchedUser.setPassword(passwordEncoder.encode(user.getPassword()));
 		fetchedUser.setPhoneNumber(user.getPhoneNumber());
 		fetchedUser.setAbout(user.getAbout());
 		fetchedUser.setProfilePic(user.getProfilePic());
@@ -50,7 +58,7 @@ public class UserServiceImpl implements UserService {
 		fetchedUser.setProviderId(user.getProviderId());
 
 		User savedUser = userRepository.save(fetchedUser);
-		return Optional.ofNullable(savedUser);
+		return Optional.of(savedUser);
 	}
 
 	@Override

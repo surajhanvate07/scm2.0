@@ -19,7 +19,7 @@ public class PageController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping("/home")
+	@GetMapping({"/home", "/"})
 	public String home(Model model) {
 		model.addAttribute("title", "Home Page");
 		System.out.println("Home page accessed");
