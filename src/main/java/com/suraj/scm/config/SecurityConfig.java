@@ -12,23 +12,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
 
-	// User create and login using java code with spring security memory authentication
-
-//	@Bean
-//	public UserDetailsService userDetailsService() {
-//		UserDetails user = User.withDefaultPasswordEncoder().username("admin").password("admin").roles("ADMIN", "USER").build();
-//
-//		InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager(user);
-//		return inMemoryUserDetailsManager;
-//	}
-
 	@Autowired
 	private SecurityCustomUserDetailsService securityCustomUserDetailsService;
+
+	@Autowired
+	private OAuthSuccessHandler oAuthSuccessHandler;
 
 	@Bean
 	public AuthenticationProvider authenticationProvider() {
@@ -61,6 +53,13 @@ public class SecurityConfig {
 					.logoutUrl("/logout")
 					.logoutSuccessUrl("/login?logout=true")
 					.deleteCookies("JSESSIONID")
+					.permitAll();
+		});
+
+		// OAuth2 login configuration
+		httpSecurity.oauth2Login(oauth -> {
+			oauth.loginPage("/login")
+					.successHandler(oAuthSuccessHandler)
 					.permitAll();
 		});
 		return httpSecurity.build();
