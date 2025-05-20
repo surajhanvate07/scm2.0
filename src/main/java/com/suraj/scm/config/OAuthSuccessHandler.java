@@ -24,7 +24,7 @@ import java.util.UUID;
 @Component
 public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
-	Logger logger = LoggerFactory.getLogger(OAuthSuccessHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(OAuthSuccessHandler.class);
 
 	@Autowired
 	private UserRepository userRepository;
@@ -47,14 +47,14 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 		user.setEmailVerified(true);
 		user.setRoles(List.of(AppConstants.ROLE_USER));
 
-		if(clientName.equalsIgnoreCase("google")) {
+		if (clientName.equalsIgnoreCase("google")) {
 			user.setEmail(oauth2User.getAttribute("email").toString());
 			user.setName(oauth2User.getAttribute("name").toString());
 			user.setProfilePic(oauth2User.getAttribute("picture").toString());
 			user.setProvider(Providers.GOOGLE);
 			user.setProviderId(oauth2User.getName());
 			user.setAbout("This is created using google oauth2");
-		} else if(clientName.equalsIgnoreCase("github")) {
+		} else if (clientName.equalsIgnoreCase("github")) {
 			String email = oauth2User.getAttribute("email").toString() != null ?
 					oauth2User.getAttribute("email").toString() : oauth2User.getAttribute("login").toString() + "@gmail.com";
 			String picture = oauth2User.getAttribute("avatar_url").toString();
