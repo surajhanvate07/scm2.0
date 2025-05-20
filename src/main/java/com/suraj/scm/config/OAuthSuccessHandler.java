@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -32,26 +33,42 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 		logger.info("OAuthSuccessHandler: User authenticated successfully");
 
+		OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+		String clientName = oAuth2AuthenticationToken.getAuthorizedClientRegistrationId();
+		logger.info("OAuthSuccessHandler: Client Name: " + clientName);
+
 		// Save the data in DB
 		DefaultOAuth2User oauth2User = (DefaultOAuth2User) authentication.getPrincipal();
-		String email = oauth2User.getAttribute("email").toString();
-		String name = oauth2User.getAttribute("name").toString();
-		String picture = oauth2User.getAttribute("picture").toString();
 
 		User user = new User();
-		user.setEmail(email);
-		user.setName(name);
-		user.setProfilePic(picture);
-		user.setPassword("password");
 		user.setUserId(UUID.randomUUID().toString());
+		user.setPassword("password");
 		user.setEnabled(true);
 		user.setEmailVerified(true);
-		user.setProvider(Providers.GOOGLE);
-		user.setProviderId(oauth2User.getName());
 		user.setRoles(List.of(AppConstants.ROLE_USER));
-		user.setAbout("This is created using google oauth2");
 
-		User savedUser = userRepository.findByEmail(email).orElse(null);
+		if(clientName.equalsIgnoreCase("google")) {
+			user.setEmail(oauth2User.getAttribute("email").toString());
+			user.setName(oauth2User.getAttribute("name").toString());
+			user.setProfilePic(oauth2User.getAttribute("picture").toString());
+			user.setProvider(Providers.GOOGLE);
+			user.setProviderId(oauth2User.getName());
+			user.setAbout("This is created using google oauth2");
+		} else if(clientName.equalsIgnoreCase("github")) {
+			String email = oauth2User.getAttribute("email").toString() != null ?
+					oauth2User.getAttribute("email").toString() : oauth2User.getAttribute("login").toString() + "@gmail.com";
+			String picture = oauth2User.getAttribute("avatar_url").toString();
+			String name = oauth2User.getAttribute("login").toString();
+
+			user.setEmail(email);
+			user.setName(name);
+			user.setProfilePic(picture);
+			user.setProvider(Providers.GITHUB);
+			user.setProviderId(oauth2User.getName());
+			user.setAbout("This is created using github oauth2");
+		}
+
+		User savedUser = userRepository.findByEmail(user.getEmail()).orElse(null);
 		if (savedUser == null) {
 			userRepository.save(user);
 			logger.info("OAuthSuccessHandler: User saved successfully");
