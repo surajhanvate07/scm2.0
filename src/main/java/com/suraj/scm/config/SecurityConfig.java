@@ -41,7 +41,7 @@ public class SecurityConfig {
 				.formLogin(form -> form
 						.loginPage("/login")                    // Your custom login page
 						.loginProcessingUrl("/authenticate")    // URL for login form POST
-						.defaultSuccessUrl("/user/dashboard", true)
+						.defaultSuccessUrl("/user/dashboard", false)
 						.failureUrl("/login?error=true")
 						.usernameParameter("email")
 						.passwordParameter("password")
