@@ -25,7 +25,7 @@ public class UserController {
 
 	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
 	public String userDashboard() {
-		return "user/userDashboard";
+		return "user/user_dashboard";
 	}
 
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)

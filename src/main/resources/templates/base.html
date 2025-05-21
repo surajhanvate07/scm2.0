@@ -11,7 +11,12 @@
 </head>
 <body class="bg-gray-100 text-black dark:bg-gray-900 dark:text-white">
 	<!-- Common Header -->
-	<div data-th-replace="navbar :: navbar"></div>
+	<div th:if="${loggedInUser}">
+		<div th:replace="~{user/user_navbar :: userNavbar}"></div>
+	</div>
+	<div th:unless="${loggedInUser}">
+		<div data-th-replace="~{navbar :: navbar}"></div>
+	</div>
 
 	<div class="p-4">
 		<section data-th-replace="${content}"></section>

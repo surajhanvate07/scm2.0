@@ -2,7 +2,7 @@
 <html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}"
 	  xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title data-th-text="${loggedInUser.name} + ' SCM Profile'">Profile Page</title>
+	<title data-th-text="${loggedInUser.name} + ' SCM Dashboard'">Profile Page</title>
 </head>
 <body>
 <div id="content">
@@ -10,14 +10,14 @@
 		<div th:replace="~{user/sidebar :: sidebar}"></div>
 	</div>
 	<div class="sm:pl-64 pt-20" style="height: 1000px;">
-		<h2>Welcome to the Profile page</h2>
+		<h2>Welcome to the Dashboard page</h2>
 		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam aliquid at culpa debitis dicta distinctio
 			dolorum ducimus
 		</p>
 	</div>
 </div>
 <script>
-	console.log("Profile page script loaded");
+	console.log("Dashboard page script loaded");
 </script>
 </body>
 </html>
