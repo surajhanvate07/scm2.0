@@ -1,16 +1,88 @@
 package com.suraj.scm.controllers;
 
+import com.suraj.scm.entities.Contact;
+import com.suraj.scm.entities.User;
+import com.suraj.scm.forms.ContactForm;
+import com.suraj.scm.helpers.EmailFinder;
+import com.suraj.scm.helpers.Message;
+import com.suraj.scm.helpers.MessageType;
+import com.suraj.scm.services.ContactService;
+import com.suraj.scm.services.UserService;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/user/contacts")
 public class ContactController {
 
+	@Autowired
+	private ContactService contactService;
+
+	@Autowired
+	private UserService userService;
+
+	private Logger logger = LoggerFactory.getLogger(ContactController.class);
 
 	@GetMapping("/add")
-	public String addContact() {
+	public String addContact(Model model) {
+		ContactForm contactForm = new ContactForm();
+		model.addAttribute("contactForm", contactForm);
 		return "user/add_contact";
+	}
+
+	@PostMapping("/add")
+	public String saveContact(@Valid @ModelAttribute ContactForm contactForm, BindingResult bindingResult, Authentication authentication, HttpSession session) {
+		logger.info("Received contact form submission: {}", contactForm);
+		if (bindingResult.hasErrors()) {
+			logger.info("Validation errors occurred");
+			return "user/add_contact";
+		}
+
+		String userName = EmailFinder.getEmailOfLoggedInUser(authentication);
+		User loggedUser = userService.getUserByEmail(userName);
+
+		Contact contact = new Contact();
+		contact.setName(contactForm.getName());
+		contact.setEmail(contactForm.getEmail());
+		contact.setPhoneNumber(contactForm.getPhoneNumber());
+		contact.setAddress(contactForm.getAddress());
+		contact.setDescription(contactForm.getDescription());
+		contact.setFavorite(contactForm.isFavorite());
+		contact.setWebsiteLink(contactForm.getWebsiteLink());
+		contact.setLinkedInLink(contactForm.getLinkedInLink());
+		contact.setUser(loggedUser);
+		// Handle profile picture upload if provided
+
+		Contact savedContact =contactService.saveContact(contact);
+
+		Message message = null;
+		if(savedContact != null) {
+			logger.info("Contact saved successfully: {}", savedContact);
+			message = Message.builder()
+					.content("Contact added successfully!")
+					.type(MessageType.green)
+					.build();
+			session.setAttribute("message", message);
+			return "redirect:/user/contacts/add";
+		} else {
+			logger.error("Failed to save contact");
+			message = Message.builder()
+					.content("Failed to add contact. Please try again.")
+					.type(MessageType.red)
+					.build();
+			session.setAttribute("message", message);
+		}
+		return "redirect:/user/contacts/add";
 	}
 }
