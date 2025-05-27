@@ -7,6 +7,7 @@ import com.suraj.scm.helpers.EmailFinder;
 import com.suraj.scm.helpers.Message;
 import com.suraj.scm.helpers.MessageType;
 import com.suraj.scm.services.ContactService;
+import com.suraj.scm.services.ImageService;
 import com.suraj.scm.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.UUID;
+
 @Controller
 @RequestMapping("/user/contacts")
 public class ContactController {
@@ -32,7 +35,10 @@ public class ContactController {
 	@Autowired
 	private UserService userService;
 
-	private Logger logger = LoggerFactory.getLogger(ContactController.class);
+	@Autowired
+	private ImageService imageService;
+
+	private final Logger logger = LoggerFactory.getLogger(ContactController.class);
 
 	@GetMapping("/add")
 	public String addContact(Model model) {
@@ -52,6 +58,11 @@ public class ContactController {
 		String userName = EmailFinder.getEmailOfLoggedInUser(authentication);
 		User loggedUser = userService.getUserByEmail(userName);
 
+		String fileName = UUID.randomUUID().toString();
+
+		//Processing the contact image
+		String fileUrl = imageService.uploadImage(contactForm.getContactPicture(), fileName);
+
 		Contact contact = new Contact();
 		contact.setName(contactForm.getName());
 		contact.setEmail(contactForm.getEmail());
@@ -61,6 +72,8 @@ public class ContactController {
 		contact.setFavorite(contactForm.isFavorite());
 		contact.setWebsiteLink(contactForm.getWebsiteLink());
 		contact.setLinkedInLink(contactForm.getLinkedInLink());
+		contact.setCloudinaryImagePublicId(fileName);
+		contact.setPicture(fileUrl);
 		contact.setUser(loggedUser);
 		// Handle profile picture upload if provided
 

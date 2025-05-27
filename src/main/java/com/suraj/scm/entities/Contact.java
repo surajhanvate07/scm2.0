@@ -25,6 +25,7 @@ public class Contact {
 	private boolean isFavorite = false;
 	private String websiteLink;
 	private String linkedInLink;
+	private String cloudinaryImagePublicId;
 
 	@ManyToOne
 	private User user;
