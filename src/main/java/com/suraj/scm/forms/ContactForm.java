@@ -1,5 +1,6 @@
 package com.suraj.scm.forms;
 
+import com.suraj.scm.validator.ValidFile;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -29,5 +30,7 @@ public class ContactForm {
 	private boolean favorite;
 	private String websiteLink;
 	private String linkedInLink;
+
+	@ValidFile(message = "Invalid file. File must be an image and size must not exceed 5 MB")
 	private MultipartFile contactPicture;
 }
