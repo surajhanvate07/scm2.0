@@ -1,6 +1,7 @@
 package com.suraj.scm.services;
 
 import com.suraj.scm.entities.Contact;
+import com.suraj.scm.entities.User;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface ContactService {
 	List<Contact> getFavoriteContactsByUserId(String userId);
 
 	List<Contact> searchContacts(String name, String email, String phoneNumber);
+
+	List<Contact> getContactsByUser(User user);
 }

@@ -1,6 +1,7 @@
 package com.suraj.scm.repositories;
 
 import com.suraj.scm.entities.Contact;
+import com.suraj.scm.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,5 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
 												   @Param("email") String email,
 												   @Param("phone") String phoneNumber);
 
+	List<Contact> findByUser(User user);
 }

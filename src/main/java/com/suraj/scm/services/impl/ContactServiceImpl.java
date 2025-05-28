@@ -1,6 +1,7 @@
 package com.suraj.scm.services.impl;
 
 import com.suraj.scm.entities.Contact;
+import com.suraj.scm.entities.User;
 import com.suraj.scm.exceptions.ResourceNotFoundException;
 import com.suraj.scm.repositories.ContactRepository;
 import com.suraj.scm.services.ContactService;
@@ -70,5 +71,10 @@ public class ContactServiceImpl implements ContactService {
 	@Override
 	public List<Contact> searchContacts(String name, String email, String phoneNumber) {
 		return contactRepository.findByNameAndEmailAndPhoneNumber(name, email, phoneNumber);
+	}
+
+	@Override
+	public List<Contact> getContactsByUser(User user) {
+		return contactRepository.findByUser(user);
 	}
 }
