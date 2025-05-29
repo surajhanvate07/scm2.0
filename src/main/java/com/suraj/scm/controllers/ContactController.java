@@ -3,6 +3,7 @@ package com.suraj.scm.controllers;
 import com.suraj.scm.entities.Contact;
 import com.suraj.scm.entities.User;
 import com.suraj.scm.forms.ContactForm;
+import com.suraj.scm.helpers.AppConstants;
 import com.suraj.scm.helpers.EmailFinder;
 import com.suraj.scm.helpers.Message;
 import com.suraj.scm.helpers.MessageType;
@@ -14,14 +15,12 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,16 +29,13 @@ import java.util.UUID;
 @RequestMapping("/user/contacts")
 public class ContactController {
 
+	private final Logger logger = LoggerFactory.getLogger(ContactController.class);
 	@Autowired
 	private ContactService contactService;
-
 	@Autowired
 	private UserService userService;
-
 	@Autowired
 	private ImageService imageService;
-
-	private final Logger logger = LoggerFactory.getLogger(ContactController.class);
 
 	@GetMapping("/add")
 	public String addContact(Model model) {
@@ -78,10 +74,10 @@ public class ContactController {
 		contact.setUser(loggedUser);
 		// Handle profile picture upload if provided
 
-		Contact savedContact =contactService.saveContact(contact);
+		Contact savedContact = contactService.saveContact(contact);
 
 		Message message = null;
-		if(savedContact != null) {
+		if (savedContact != null) {
 			logger.info("Contact saved successfully: {}", savedContact);
 			message = Message.builder()
 					.content("Contact added successfully!")
@@ -101,18 +97,19 @@ public class ContactController {
 	}
 
 	@GetMapping
-	public String viewContacts(Model model, Authentication authentication) {
+	public String viewContacts(@RequestParam(value = "page", defaultValue = "0") int page,
+							   @RequestParam(value = "size", defaultValue = "5") int size,
+							   @RequestParam(value = "sortBy", defaultValue = "name") String sortBy,
+							   @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+							   Model model, Authentication authentication) {
 		String userName = EmailFinder.getEmailOfLoggedInUser(authentication);
 		User loggedUser = userService.getUserByEmail(userName);
 
-		List<Contact> contactList = contactService.getContactsByUserId(loggedUser.getUserId());
+		Page<Contact> pageContacts = contactService.getContactsByUserId(loggedUser.getUserId(), page, size, sortBy, sortDir);
 
-		for (Contact c : contactList) {
-			logger.info("Contact Link: {}", c.getWebsiteLink());
-		}
-
-		model.addAttribute("contacts", contactList);
-
+		model.addAttribute("pageContacts", pageContacts);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("pageSize", AppConstants.PAGE_SIZE);
 		return "user/view_contacts";
 	}
 }

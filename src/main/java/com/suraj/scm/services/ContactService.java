@@ -2,6 +2,7 @@ package com.suraj.scm.services;
 
 import com.suraj.scm.entities.Contact;
 import com.suraj.scm.entities.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface ContactService {
 
 	List<Contact> getAllContacts();
 
-	List<Contact> getContactsByUserId(String userId);
+	Page<Contact> getContactsByUserId(String userId, int page, int size, String sortBy, String sortDir);
 
 	List<Contact> getFavoriteContactsByUserId(String userId);
 

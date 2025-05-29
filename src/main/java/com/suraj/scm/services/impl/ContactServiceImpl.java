@@ -6,6 +6,10 @@ import com.suraj.scm.exceptions.ResourceNotFoundException;
 import com.suraj.scm.repositories.ContactRepository;
 import com.suraj.scm.services.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,11 +57,26 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
-	public List<Contact> getContactsByUserId(String userId) {
+	public Page<Contact> getContactsByUserId(String userId, int page, int size, String sortBy, String sortDir) {
+		if (sortBy == null || sortBy.isEmpty()) {
+			sortBy = "name"; // Default sorting by name
+		}
+		if (sortDir == null || sortDir.isEmpty()) {
+			sortDir = "asc"; // Default sorting direction
+		}
+		if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
+			throw new IllegalArgumentException("Sort direction must be either 'asc' or 'desc'");
+		}
+		// Create a sort object based on the provided sortBy and sortDir
+		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+		// Create a Pageable object with the specified page, size, and sort
+		Pageable pageable = PageRequest.of(page, size, sort);
+
 		if (userId == null || userId.isEmpty()) {
 			throw new IllegalArgumentException("User ID cannot be null or empty");
 		}
-		return contactRepository.findByUserId(userId);
+		return contactRepository.findByUserId(userId, pageable);
 	}
 
 	@Override

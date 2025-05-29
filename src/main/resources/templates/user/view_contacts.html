@@ -12,7 +12,7 @@
 	<div class="sm:pl-64 pt-20">
 		<div class="">
 			<h1 class="text-4xl text-center">All Contacts</h1>
-			<div data-th-if="${contacts == null or #lists.isEmpty(contacts)}"
+			<div data-th-if="${pageContacts.content == null or #lists.isEmpty(pageContacts.content)}"
 				 class="bg-gray-50 dark:bg-gray-800 p-6 mt-4 rounded-lg text-center space-y-3">
 				<h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">No contacts found</h2>
 				<span class="block text-gray-600 dark:text-gray-400 text-sm">Start building your contact list now.</span>
@@ -21,7 +21,7 @@
 					Add Contact
 				</a>
 			</div>
-			<div class="contacts-container p-5" data-th-if="${!#lists.isEmpty(contacts)}">
+			<div class="contacts-container p-5" data-th-if="${!#lists.isEmpty(pageContacts.content)}">
 				<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 					<div class="flex p-5 items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
 						<label class="sr-only">Search</label>
@@ -56,7 +56,7 @@
 						</tr>
 						</thead>
 						<tbody>
-						<tr data-th-object="${contact}" data-th-each="contact : ${contacts}"
+						<tr data-th-object="${contact}" data-th-each="contact : ${pageContacts.content}"
 							class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 							<th scope="row"
 								class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
@@ -100,6 +100,54 @@
 						</tr>
 						</tbody>
 					</table>
+					<div class="pagination_container p-5 text-center">
+						<nav aria-label="Page navigation example">
+							<ul class="inline-flex -space-x-px text-base h-10">
+								<!-- Previous Button -->
+								<li th:classappend="${currentPage == 0} ? 'pointer-events-none opacity-50'">
+									<a th:if="${currentPage > 0}"
+									   th:href="@{'/user/contacts'(size=${pageSize}, page=${currentPage - 1})}"
+									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-700 bg-white border border-gray-300 rounded-s-lg
+            hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300
+            dark:hover:bg-gray-700 dark:hover:text-white">
+										Previous
+									</a>
+									<a th:unless="${currentPage > 0}"
+									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-gray-200 border border-gray-300 rounded-s-lg
+            cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
+										Previous
+									</a>
+								</li>
+
+								<!-- Page Numbers -->
+								<li th:each="index : ${#numbers.sequence(0, pageContacts.totalPages - 1)}">
+									<a th:href="@{'/user/contacts'(size=${pageSize}, page=${index})}"
+									   th:classappend="${index == currentPage} ?
+       ' bg-blue-50 text-blue-600 border border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-700 ' :
+       ' text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'"
+									   class="flex items-center justify-center px-4 h-10 leading-tight">
+										<span th:text="${index + 1}"></span>
+									</a>
+								</li>
+
+								<li th:classappend="${currentPage + 1 >= pageContacts.totalPages} ? 'pointer-events-none opacity-50'">
+									<a th:if="${currentPage + 1 < pageContacts.totalPages}"
+									   th:href="@{'/user/contacts'(size=${pageSize}, page=${currentPage + 1})}"
+									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-700 bg-white border border-gray-300 rounded-e-lg
+            hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300
+            dark:hover:bg-gray-700 dark:hover:text-white">
+										Next
+									</a>
+									<a th:unless="${currentPage + 1 < pageContacts.totalPages}"
+									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-gray-200 border border-gray-300 rounded-e-lg
+            cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
+										Next
+									</a>
+								</li>
+
+							</ul>
+						</nav>
+					</div>
 				</div>
 			</div>
 		</div>
