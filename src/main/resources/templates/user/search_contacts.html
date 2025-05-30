@@ -2,7 +2,7 @@
 <html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}"
 	  xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title data-th-text="${loggedInUser.name} + ' SCM Contacts'">Contacts Page</title>
+	<title>Search Page</title>
 </head>
 <body>
 <div id="content">
@@ -117,7 +117,7 @@
 								<!-- Previous Button -->
 								<li th:classappend="${currentPage == 0} ? 'pointer-events-none opacity-50'">
 									<a th:if="${currentPage > 0}"
-									   th:href="@{'/user/contacts'(size=${pageSize}, page=${currentPage - 1})}"
+									   th:href="@{'/user/contacts/search'(size=${pageSize}, page=${currentPage - 1}, field=${contactSearchForm.field}, value=${contactSearchForm.value})}"
 									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-700 bg-white border border-gray-300 rounded-s-lg
             hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300
             dark:hover:bg-gray-700 dark:hover:text-white">
@@ -132,7 +132,7 @@
 
 								<!-- Page Numbers -->
 								<li th:each="index : ${#numbers.sequence(0, pageContacts.totalPages - 1)}">
-									<a th:href="@{'/user/contacts'(size=${pageSize}, page=${index})}"
+									<a th:href="@{'/user/contacts/search'(size=${pageSize}, page=${index}, field=${contactSearchForm.field}, value=${contactSearchForm.value})}"
 									   th:classappend="${index == currentPage} ?
        ' bg-blue-50 text-blue-600 border border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-700 ' :
        ' text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'"
@@ -143,7 +143,7 @@
 
 								<li th:classappend="${currentPage + 1 >= pageContacts.totalPages} ? 'pointer-events-none opacity-50'">
 									<a th:if="${currentPage + 1 < pageContacts.totalPages}"
-									   th:href="@{'/user/contacts'(size=${pageSize}, page=${currentPage + 1})}"
+									   th:href="@{'/user/contacts/search'(size=${pageSize}, page=${currentPage + 1}, field=${contactSearchForm.field}, value=${contactSearchForm.value})}"
 									   class="flex items-center justify-center px-4 h-10 leading-tight text-gray-700 bg-white border border-gray-300 rounded-e-lg
             hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300
             dark:hover:bg-gray-700 dark:hover:text-white">
@@ -165,7 +165,7 @@
 	</div>
 </div>
 <script>
-	console.log("Contacts page script loaded");
+	console.log("Search page script loaded");
 </script>
 </body>
 </html>

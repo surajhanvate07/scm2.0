@@ -96,4 +96,29 @@ public class ContactServiceImpl implements ContactService {
 	public List<Contact> getContactsByUser(User user) {
 		return contactRepository.findByUser(user);
 	}
+
+	@Override
+	public Page<Contact> searchByField(String field, String value, int page, int size, String sortBy, String sortDir, User user) {
+		if (sortBy == null || sortBy.isEmpty()) {
+			sortBy = "name"; // Default sorting by name
+		}
+		if (sortDir == null || sortDir.isEmpty()) {
+			sortDir = "asc"; // Default sorting direction
+		}
+		if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
+			throw new IllegalArgumentException("Sort direction must be either 'asc' or 'desc'");
+		}
+		// Create a sort object based on the provided sortBy and sortDir
+		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+		// Create a Pageable object with the specified page, size, and sort
+		Pageable pageable = PageRequest.of(page, size, sort);
+
+		return switch (field.toLowerCase()) {
+			case "name" -> contactRepository.findByNameContainingAndUser(value, user, pageable);
+			case "email" -> contactRepository.findByEmailContainingAndUser(value, user, pageable);
+			case "phone" -> contactRepository.findByPhoneNumberContainingAndUser(value, user, pageable);
+			default -> throw new IllegalArgumentException("Invalid search field: " + field);
+		};
+	}
 }

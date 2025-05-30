@@ -24,4 +24,9 @@ public interface ContactRepository extends JpaRepository<Contact, String> {
 												   @Param("phone") String phoneNumber);
 
 	List<Contact> findByUser(User user);
+
+	Page<Contact> findByNameContainingAndUser(String name, User user,  Pageable pageable);
+	Page<Contact> findByEmailContainingAndUser(String email, User user, Pageable pageable);
+	Page<Contact> findByPhoneNumberContainingAndUser(String phoneNumber, User user, Pageable pageable);
+
 }

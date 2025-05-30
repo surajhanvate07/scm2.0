@@ -24,4 +24,6 @@ public interface ContactService {
 	List<Contact> searchContacts(String name, String email, String phoneNumber);
 
 	List<Contact> getContactsByUser(User user);
+
+	Page<Contact> searchByField(String field, String value, int page, int size, String sortBy, String sortDir, User loggedUser);
 }
