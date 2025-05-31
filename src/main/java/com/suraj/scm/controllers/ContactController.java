@@ -132,9 +132,7 @@ public class ContactController {
 		User loggedUser = userService.getUserByEmail(EmailFinder.getEmailOfLoggedInUser(authentication));
 
 		Page<Contact> searchedList = contactService.searchByField(contactSearchForm.getField(), contactSearchForm.getValue(), page, size, sortBy, sortDir, loggedUser);
-		for( Contact contact : searchedList) {
-			logger.info("Found contact: {}", contact.getEmail());
-		}
+		logger.info("Total contacts found: {}", searchedList.getTotalElements());
 
 		model.addAttribute("pageContacts", searchedList);
 		model.addAttribute("currentPage", page);
