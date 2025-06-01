@@ -11,6 +11,8 @@ import com.suraj.scm.helpers.MessageType;
 import com.suraj.scm.services.ContactService;
 import com.suraj.scm.services.ImageService;
 import com.suraj.scm.services.UserService;
+import com.suraj.scm.validator.OnCreate;
+import com.suraj.scm.validator.OnUpdate;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -21,9 +23,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -38,6 +40,20 @@ public class ContactController {
 	@Autowired
 	private ImageService imageService;
 
+	private static ContactForm getUpdateContactForm(Contact contact) {
+		ContactForm contactForm = new ContactForm();
+		contactForm.setName(contact.getName());
+		contactForm.setEmail(contact.getEmail());
+		contactForm.setPhoneNumber(contact.getPhoneNumber());
+		contactForm.setAddress(contact.getAddress());
+		contactForm.setDescription(contact.getDescription());
+		contactForm.setFavorite(contact.isFavorite());
+		contactForm.setWebsiteLink(contact.getWebsiteLink());
+		contactForm.setLinkedInLink(contact.getLinkedInLink());
+		contactForm.setPicture(contact.getPicture());
+		return contactForm;
+	}
+
 	@GetMapping("/add")
 	public String addContact(Model model) {
 		ContactForm contactForm = new ContactForm();
@@ -46,7 +62,7 @@ public class ContactController {
 	}
 
 	@PostMapping("/add")
-	public String saveContact(@Valid @ModelAttribute ContactForm contactForm, BindingResult bindingResult, Authentication authentication, HttpSession session) {
+	public String saveContact(@Validated(OnCreate.class) @ModelAttribute ContactForm contactForm, BindingResult bindingResult, Authentication authentication, HttpSession session) {
 		logger.info("Received contact form submission: {}", contactForm);
 		if (bindingResult.hasErrors()) {
 			logger.info("Validation errors occurred");
@@ -55,11 +71,6 @@ public class ContactController {
 
 		String userName = EmailFinder.getEmailOfLoggedInUser(authentication);
 		User loggedUser = userService.getUserByEmail(userName);
-
-		String fileName = UUID.randomUUID().toString();
-
-		//Processing the contact image
-		String fileUrl = imageService.uploadImage(contactForm.getContactPicture(), fileName);
 
 		Contact contact = new Contact();
 		contact.setName(contactForm.getName());
@@ -70,10 +81,14 @@ public class ContactController {
 		contact.setFavorite(contactForm.isFavorite());
 		contact.setWebsiteLink(contactForm.getWebsiteLink());
 		contact.setLinkedInLink(contactForm.getLinkedInLink());
-		contact.setCloudinaryImagePublicId(fileName);
-		contact.setPicture(fileUrl);
 		contact.setUser(loggedUser);
 		// Handle profile picture upload if provided
+		if (contactForm.getContactPicture() != null && !contactForm.getContactPicture().isEmpty()) {
+			String fileName = UUID.randomUUID().toString();
+			String imageUploadedUrl = imageService.uploadImage(contactForm.getContactPicture(), fileName);
+			contact.setCloudinaryImagePublicId(fileName);
+			contact.setPicture(imageUploadedUrl);
+		}
 
 		Contact savedContact = contactService.saveContact(contact);
 
@@ -97,6 +112,8 @@ public class ContactController {
 		return "redirect:/user/contacts/add";
 	}
 
+	// Search Handler
+
 	@GetMapping
 	public String viewContacts(@RequestParam(value = "page", defaultValue = "0") int page,
 							   @RequestParam(value = "size", defaultValue = "5") int size,
@@ -118,8 +135,6 @@ public class ContactController {
 
 		return "user/view_contacts";
 	}
-
-	// Search Handler
 
 	@GetMapping("/search")
 	public String searchHandler(@ModelAttribute ContactSearchForm contactSearchForm,
@@ -163,6 +178,69 @@ public class ContactController {
 
 		session.setAttribute("message", message);
 		return "redirect:/user/contacts";
-
 	}
+
+	@GetMapping("/edit/{contactId}")
+	public String editContact(@PathVariable("contactId") String contactId, Model model) {
+		logger.info("Editing contact with ID: {}", contactId);
+		Contact contact = contactService.getContactById(contactId);
+		if (contact == null) {
+			logger.error("Contact not found with ID: {}", contactId);
+			return "error";
+		}
+
+		ContactForm contactForm = getUpdateContactForm(contact);
+
+		model.addAttribute("contactForm", contactForm);
+		model.addAttribute("contactId", contactId);
+
+		return "user/update_contact_modal";
+	}
+
+	@PostMapping("/update/{contactId}")
+	public String updateContact(@PathVariable("contactId") String contactId, @Validated(OnUpdate.class) @ModelAttribute ContactForm contactForm, BindingResult result, Model model, HttpSession session) {
+		if (result.hasErrors()) {
+			logger.error("Validation errors occurred while updating contact");
+			model.addAttribute("contactForm", contactForm);
+			return "user/update_contact_modal";
+		}
+
+		Contact contact = contactService.getContactById(contactId);
+		contact.setName(contactForm.getName());
+		contact.setEmail(contactForm.getEmail());
+		contact.setPhoneNumber(contactForm.getPhoneNumber());
+		contact.setAddress(contactForm.getAddress());
+		contact.setDescription(contactForm.getDescription());
+		contact.setFavorite(contactForm.isFavorite());
+		contact.setWebsiteLink(contactForm.getWebsiteLink());
+		contact.setLinkedInLink(contactForm.getLinkedInLink());
+
+		// Processing the contact image
+		if (contactForm.getContactPicture() != null && !contactForm.getContactPicture().isEmpty()) {
+			String fileName = UUID.randomUUID().toString();
+			String imageUploadedUrl = imageService.uploadImage(contactForm.getContactPicture(), fileName);
+			contact.setCloudinaryImagePublicId(fileName);
+			contact.setPicture(imageUploadedUrl);
+			contactForm.setPicture(imageUploadedUrl);
+		}
+
+		Contact updatedContact = contactService.updateContact(contact);
+		Message message;
+		if (updatedContact != null) {
+			logger.info("Contact updated successfully: {}", updatedContact);
+			message = Message.builder()
+					.content("Contact updated successfully!")
+					.type(MessageType.green)
+					.build();
+		} else {
+			logger.error("Failed to update contact with ID: {}", contactId);
+			message = Message.builder()
+					.content("Failed to update contact. Please try again.")
+					.type(MessageType.red)
+					.build();
+		}
+		session.setAttribute("message", message);
+		return "redirect:/user/contacts";
+	}
+
 }

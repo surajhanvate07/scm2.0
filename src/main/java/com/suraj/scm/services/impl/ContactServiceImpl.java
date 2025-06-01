@@ -38,6 +38,29 @@ public class ContactServiceImpl implements ContactService {
 
 	@Override
 	public Contact updateContact(Contact contact) {
+		Contact existingContact = getContactById(contact.getId());
+		if (existingContact != null) {
+			// Update the existing contact with new values
+			existingContact.setName(contact.getName());
+			existingContact.setEmail(contact.getEmail());
+			existingContact.setPhoneNumber(contact.getPhoneNumber());
+			existingContact.setAddress(contact.getAddress());
+			existingContact.setFavorite(contact.isFavorite());
+			if(contact.getDescription() != null) {
+				existingContact.setDescription(contact.getDescription());
+			}
+			if(contact.getWebsiteLink() != null) {
+				existingContact.setWebsiteLink(contact.getWebsiteLink());
+			}
+			if(contact.getLinkedInLink() != null) {
+				existingContact.setLinkedInLink(contact.getLinkedInLink());
+			}
+			existingContact.setPicture(contact.getPicture());
+			if(contact.getCloudinaryImagePublicId() != null) {
+				existingContact.setCloudinaryImagePublicId(contact.getCloudinaryImagePublicId());
+			}
+			return contactRepository.save(existingContact);
+		}
 		return null;
 	}
 

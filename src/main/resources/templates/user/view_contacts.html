@@ -104,7 +104,7 @@
 									<button th:onclick="deleteContact([[${contact.id}]])" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
 										<i class="fa-solid w-6 h-6 fa-trash"></i>
 									</button>
-									<a href="" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+									<a th:href="@{|/user/contacts/edit/*{id}|}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
 										<i class="fa-solid w-6 h-6 fa-pen"></i>
 									</a>
 									<button th:onclick="loadContactData([[${contact.id}]])" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">

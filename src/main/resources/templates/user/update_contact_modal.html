@@ -2,7 +2,7 @@
 <html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}"
 	  xmlns:th="http://www.thymeleaf.org">
 <head>
-	<title data-th-text="${loggedInUser.name} + ' SCM Add Contact'">Add Contact Page</title>
+	<title data-th-text="${loggedInUser.name} + ' SCM Update Contact'">Update Contact Page</title>
 </head>
 <body>
 <div id="content">
@@ -15,8 +15,8 @@
 			<div class="col-span-12 md:col-span-6">
 				<div class="card block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
 					<div data-th-replace="~{message::messagebox}"></div>
-					<h1 class="text-2xl font-semibold text-center">Add New Contact</h1>
-					<form class="mt-4" data-th-action="@{'/user/contacts/add'}" data-th-object="${contactForm}" method="post" enctype="multipart/form-data">
+					<h1 class="text-2xl font-semibold text-center">Update Contact</h1>
+					<form class="mt-4" data-th-action="@{'/user/contacts/update/' + ${contactId}}" data-th-object="${contactForm}" method="post" enctype="multipart/form-data">
 						<!-- Contact Name -->
 						<div class="mb-3">
 							<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name</label>
@@ -90,7 +90,7 @@
 							<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload Contact Picture</label>
 							<input id="file_input" data-th-field="*{contactPicture}" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file">
 							<p data-th-if="${#fields.hasErrors('contactPicture')}" data-th-errors="*{contactPicture}" class="text-red-600 px-1 py-2"></p>
-							<img src="" class="max-h-[16rem] mx-auto rounded-lg shadow m-2 hidden" id="upload_image_preview" alt="Image Preview">
+							<img data-th-src="*{picture}" class="max-h-[16rem] mx-auto rounded-lg shadow m-2" id="upload_image_preview" alt="Image Preview">
 						</div>
 						<!-- Contact favourite -->
 						<div class="flex items-center mb-4 mt-2">
@@ -102,7 +102,7 @@
 							</label>
 						</div>
 						<div class="button-container text-center">
-							<button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Add Contact</button>
+							<button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Update Contact</button>
 							<button type="reset" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Reset</button>
 						</div>
 					</form>
