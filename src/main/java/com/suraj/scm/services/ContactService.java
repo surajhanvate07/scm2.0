@@ -13,7 +13,7 @@ public interface ContactService {
 
 	Contact updateContact(Contact contact);
 
-	void deleteContact(String id);
+	boolean deleteContact(String id);
 
 	List<Contact> getAllContacts();
 

@@ -140,4 +140,29 @@ public class ContactController {
 		model.addAttribute("contactSearchForm", contactSearchForm);
 		return "user/search_contacts";
 	}
+
+	@RequestMapping("/delete/{contactId}")
+	public String deleteContact(@PathVariable("contactId") String contactId, HttpSession session) {
+		logger.info("Attempting to delete contact with ID: {}", contactId);
+		boolean isDeleted = contactService.deleteContact(contactId);
+		Message message;
+
+		if (isDeleted) {
+			logger.info("Contact deleted successfully");
+			message = Message.builder()
+					.content("Contact deleted successfully!")
+					.type(MessageType.green)
+					.build();
+		} else {
+			logger.error("Failed to delete contact with ID: {}", contactId);
+			message = Message.builder()
+					.content("Failed to delete contact. Please try again.")
+					.type(MessageType.red)
+					.build();
+		}
+
+		session.setAttribute("message", message);
+		return "redirect:/user/contacts";
+
+	}
 }

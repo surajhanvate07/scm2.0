@@ -47,7 +47,6 @@ async function loadContactData(contactId) {
 
 	try {
     	const data = await (await fetch(`/api/contacts/${contactId}`)).json();
-    	console.log("Contact data fetched:", data);
 		document.getElementById("contact_name").textContent = data.name;
 		document.getElementById("contact_email").textContent = data.email;
 		document.getElementById("contact_phone").textContent = data.phoneNumber;
@@ -82,3 +81,29 @@ async function loadContactData(contactId) {
     	console.error("Error fetching contact data:", error);
     }
 }
+
+async function deleteContact(contactId) {
+  const isDarkMode = document.documentElement.classList.contains("dark");
+
+  Swal.fire({
+    title: "Do you want to delete the contact?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+    confirmButtonColor: "#e3342f", // red-600
+    cancelButtonColor: "#6b7280",  // gray-500
+    background: isDarkMode ? "#1f2937" : "#ffffff", // gray-800 or white
+    color: isDarkMode ? "#e5e7eb" : "#111827",       // gray-200 or gray-900
+    customClass: {
+      popup: 'rounded-lg shadow-lg',
+      confirmButton: 'focus:outline-none',
+      cancelButton: 'focus:outline-none',
+    }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+    	const url = "/user/contacts/delete/" + contactId;
+    	window.location.replace(url);
+    }
+  });
+}
+

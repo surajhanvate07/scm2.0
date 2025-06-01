@@ -47,7 +47,8 @@
 							<div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
 								<i class="fa-solid fa-phone w-4 h-4 text-gray-500 dark:text-gray-400"></i>
 							</div>
-							<input type="text" data-th-field="*{phoneNumber}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Phone Number">
+							<input type="text" data-th-field="*{phoneNumber}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" maxlength="10" pattern="[0-9]{10}"
+								   inputmode="numeric" placeholder="Your Phone Number">
 						</div>
 						<p data-th-if="${#fields.hasErrors('phoneNumber')}" data-th-errors="*{phoneNumber}" class="text-red-600 px-1 py-2"></p>
 						<!-- Contact Address -->

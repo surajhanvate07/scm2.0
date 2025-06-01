@@ -42,10 +42,11 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
-	public void deleteContact(String id) {
+	public boolean deleteContact(String id) {
 		Contact contact = getContactById(id);
 		if (contact != null) {
 			contactRepository.delete(contact);
+			return true;
 		} else {
 			throw new ResourceNotFoundException("Contact not found with id: " + id);
 		}
