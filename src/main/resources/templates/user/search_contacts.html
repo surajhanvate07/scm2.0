@@ -104,7 +104,7 @@
 									<a href="" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
 										<i class="fa-solid w-6 h-6 fa-pen"></i>
 									</a>
-									<a href="" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">
+									<a th:onclick="loadContactData([[${contact.id}]])" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">
 										<i class="fa-solid w-6 h-6 fa-eye"></i>
 									</a>
 								</div>
@@ -163,8 +163,10 @@
 				</div>
 			</div>
 		</div>
+		<div data-th-replace="~{user/contact_modal :: contact_modal}"></div>
 	</div>
 </div>
+<script data-th-src="@{'/js/contact.js'}"></script>
 <script>
 	console.log("Search page script loaded");
 </script>
